@@ -1,0 +1,8 @@
+This program is a twitter bot that when run will take your latest mention and use it to search for the most popular post using
+those words. This program is set you retweet every hour but that can be changed by changing the wait global variable (which is
+in minuts)
+
+This program has 2 seperate threads one that collects the information from your mentions and another that handles the reposting.
+
+You can use this program for your own twitter account by changing where the program saids 'your keys' to the appropriate keys
+for your account.
