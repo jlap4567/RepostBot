@@ -88,6 +88,8 @@ def repostTweet():
     phrase that matches search
     PostID - int, the id of the post that is going to be retweeted
     """
+    global wait
+    
     #loop that allows program to continuously retweet
     while(True):
         while(True):
@@ -132,6 +134,7 @@ def getNewMention():
     A funciton that allows a thread to continuously check for new mentions
     """
     global keyword
+    global wait
 
     #Loop that allows program to continuously get new mentions
     while(True):
