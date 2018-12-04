@@ -29,15 +29,15 @@ usedTweets = []
 
 #sets up some variables (wait could be done in a function but I it also
 # works putting here because it is easier to change)
-search = ' '
+keyword = ' '
 wait = 60
 
 def getFMPosts():
     """
     Collects 100 posts with Floridaman Hashtag from today
     and saves them in a csv file
-    search - string: the key word or key phrase you want to search for
     """
+    global keyword
     #Gets and formats todays date
     now = datetime.datetime.now()
     date = str(now.year) + "-" + str(now.month) + "-" + str(now.day)
@@ -48,7 +48,7 @@ def getFMPosts():
 
     #creates a csv file that contains the last 100 post that have been posted
     #in that day
-    for tweet in tweepy.Cursor(api.search,q=search,count=1000,
+    for tweet in tweepy.Cursor(api.search,q=keyword,count=1000,
                                lang="en",
                                since=date).items():
         csvWriter.writerow([tweet.id, tweet.favorite_count])
@@ -63,6 +63,7 @@ def postPicker():
     """
     maxLikes = 0
     topPost = 'NULL'
+    global usedTweets
 
     #Opens csv file that contains all recent tweets
     csvFile = open('FM.csv', 'r')
@@ -115,8 +116,10 @@ def mentionChecker(mention):
     and returns the key phrase that is in the tweet
     mention - string, the text of the latest mention
     """
+    global keyword
+
     smention = mention.split(" ")
-    if(" ".join(smention[1:]) == search):
+    if(" ".join(smention[1:]) == keyword):
         return None
     else:
         return " ".join(smention[1:])
@@ -125,10 +128,12 @@ def getNewMention():
     """
     A funciton that allows a thread to continuously check for new mentions
     """
+    global keyword
+
     while(True):
         if(mentionChecker(recentMention()) != None):
-            search = mentionChecker(recentMention())
-            print("looking for key phrase: " + search)
+            keyword = mentionChecker(recentMention())
+            print("looking for key phrase: " + keyword)
             time.sleep(wait*60)
 
 
