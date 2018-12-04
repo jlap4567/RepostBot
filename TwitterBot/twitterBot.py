@@ -14,10 +14,10 @@ import time #allows program to wait for an amount of time
 import threading #allows the program to run multithreaded
 
 #Keys to access twitter account
-CONSUMER_KEY = 'bz5MIgTVltSAGrOVRwTEBJFgm'
-CONSUMER_SECRET = 'sfMSclxsco6A34DqPEUok2hAifIzhZs7mrPGOcYvFNRKreZuHf'
-ACCESS_KEY = '1061740751288262658-PHkUt0Hs3myAj1cCmsvWRmSu2THOR5'
-ACCESS_SECRET = 'DO5Dr8L3UWGI7IelaByq78tjC9ANcSDXttZmlGGl0EUyc'
+CONSUMER_KEY = 'your key'
+CONSUMER_SECRET = 'your key'
+ACCESS_KEY = 'your key'
+ACCESS_SECRET = 'your key'
 
 #Uses twitter keys
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
