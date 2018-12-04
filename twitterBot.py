@@ -11,6 +11,7 @@ import csv #allows program to create a csv file to use as a database
 import datetime #allow program to get the current date and time
 import os #allows program to operate using mac os commands
 import time #allows program to wait for an amount of time
+import threading #allows the program to run multithreaded
 
 #Keys to access twitter account
 CONSUMER_KEY = 'bz5MIgTVltSAGrOVRwTEBJFgm'
@@ -23,15 +24,21 @@ auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
 api = tweepy.API(auth)
 
-#Makes sure the program doesnt try to retweet the same thing twice
+#Makes sure the program doesnt try to retweet the same thing
 usedTweets = []
+
+#sets up some variables (wait could be done in a function but I it also
+# works putting here because it is easier to change)
+search = ' '
+wait = 60
 
 def getFMPosts():
     """
     Collects 100 posts with Floridaman Hashtag from today
     and saves them in a csv file
+    search - string: the key word or key phrase you want to search for
     """
-
+    #Gets and formats todays date
     now = datetime.datetime.now()
     date = str(now.year) + "-" + str(now.month) + "-" + str(now.day)
     # Open/Create a file to append data
@@ -41,7 +48,7 @@ def getFMPosts():
 
     #creates a csv file that contains the last 100 post that have been posted
     #in that day
-    for tweet in tweepy.Cursor(api.search,q="Florida man",count=1000,
+    for tweet in tweepy.Cursor(api.search,q=search,count=1000,
                                lang="en",
                                since=date).items():
         csvWriter.writerow([tweet.id, tweet.favorite_count])
@@ -73,26 +80,69 @@ def postPicker():
     return topPost
 
 
-def repostTweet(postID):
+def repostTweet():
     """
-    retweets the post
+    Allows a thread to continuously retweet posts that have the key
+    phrase that matches search
     PostID - int, the id of the post that is going to be retweeted
     """
-    try:
-        api.retweet(postID)
-    except tweepyError:
-        print("There was a problem with this repost")
-
-
-def main():
     while(True):
         while(True):
             getFMPosts()
             postID = postPicker()
-            repostTweet(postID)
+
+            try:
+                api.retweet(postID)
+            except tweepy.error.TweepError:
+                break
+
             os.remove('FM.csv')
             print("Repost Made")
-            time.sleep(60)
+            time.sleep(wait*60)
+
+
+def recentMention():
+    """
+    Returns the most recent mention to your account
+    """
+    newMention = api.mentions_timeline(count = 1) #for some reason my compiler is fucking up here
+    return newMention[0].text
+
+
+def mentionChecker(mention):
+    """
+    This funciton checks to see if the newist mention is already in use
+    and returns the key phrase that is in the tweet
+    mention - string, the text of the latest mention
+    """
+    smention = mention.split(" ")
+    if(" ".join(smention[1:]) == search):
+        return None
+    else:
+        return " ".join(smention[1:])
+
+def getNewMention():
+    """
+    A funciton that allows a thread to continuously check for new mentions
+    """
+    while(True):
+        if(mentionChecker(recentMention()) != None):
+            search = mentionChecker(recentMention())
+            print("looking for key phrase: " + search)
+            time.sleep(wait*60)
+
+
+def main():
+    #thread that looks for the newist mention
+    t1 = threading.Thread(target=getNewMention, args=[])
+    #thread that retweets the keyword
+    t2 = threading.Thread(target=repostTweet, args=[])
+
+    #Runs the threads
+    t1.start()
+    time.sleep(10)
+    t2.start()
+
 
 if __name__ == '__main__':
     main()
