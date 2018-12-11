@@ -1,10 +1,11 @@
 """
 Writen by: Jacob Lapinson
-Date: 12/01/18
+Date Started: 12/01/18
+Date last worked on: 12/04/19
 
-This program tells a twitter account to check the most popular
-tweets using the Floridaman search parameter then selects the most
-popular one that has not been retweeted by the account and retweets it
+This is a multithreaded program that has one thread that checks for mentions
+in your timeline and allows another thread to use the information to retweet
+the most popular tweets that use the key terms from that tweet
 """
 import tweepy #allows the program to interact with twitter api
 import csv #allows program to create a csv file to use as a database
@@ -87,6 +88,7 @@ def repostTweet():
     phrase that matches search
     PostID - int, the id of the post that is going to be retweeted
     """
+    #loop that allows program to continuously retweet
     while(True):
         while(True):
             getFMPosts()
@@ -97,6 +99,7 @@ def repostTweet():
             except tweepy.error.TweepError:
                 break
 
+            #Deletes csv file so a new one can be made
             os.remove('FM.csv')
             print("Repost Made")
             time.sleep(wait*60)
@@ -130,6 +133,7 @@ def getNewMention():
     """
     global keyword
 
+    #Loop that allows program to continuously get new mentions
     while(True):
         if(mentionChecker(recentMention()) != None):
             keyword = mentionChecker(recentMention())
@@ -145,7 +149,7 @@ def main():
 
     #Runs the threads
     t1.start()
-    time.sleep(10)
+    time.sleep(3)
     t2.start()
 
 
